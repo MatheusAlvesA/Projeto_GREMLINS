@@ -1,8 +1,8 @@
 #include "MemoryPool.h"
 
-struct Tag {StoragePool * pool;};
+struct Tag {SLPool * pool;};
 
-void *operator new(size_t bytes, StoragePool &p) {
+void *operator new(size_t bytes, SLPool &p) {
 Tag *const tag = reinterpret_cast<Tag*> (p.Allocate(bytes+sizeof(Tag)));
 tag->pool = &p;
 // skip sizeof tag to get the raw data - block .
