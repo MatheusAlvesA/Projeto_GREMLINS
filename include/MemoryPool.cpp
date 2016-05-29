@@ -30,12 +30,44 @@ void *SLPool::Allocate(size_t tamanho) {
     anterior->mp_Next = trabalhador + Nblocks; // a nova zona vazia é a anterior pulando a parte alocada
     anterior->mp_Next->mui_Length = trabalhador->mui_Length - Nblocks; // configurando a zona nova com seu tamanho reduzido
     anterior->mp_Next->mp_Next = trabalhador->mp_Next; // a nova zona reduzida aponta para a próxima zona sem alteração
+    trabalhador->mui_Length = Nblocks; // a zona alocada tem esse tamanho
   }
-  return reinterpret_cast<byte*> (trabalhador + sizeof(Header)); // retornando a zona livre "disfarçada" de void santando o local onde está gravado o tamanho da zona
+  return reinterpret_cast<Header*>(trabalhador) + 1U; // retornando a zona livre "disfarçada" de void sautando o local onde está gravado o tamanho da zona
 }
 
 void SLPool::Free(void *entrada) {
-  Block *zona = reinterpret_cast<Block*>(entrada); // convertendo de volta em zona de memoria
+  Block *zona = reinterpret_cast<Block*>(reinterpret_cast<Header*>(entrada) - 1U); // convertendo de volta em zona de memoria e recuperando o valor header
+  Block *seguinte = this->mr_Sentinel.mp_Next; // inicia o loop com a primeira zona vazia
+  Block *anterior = &this->mr_Sentinel; // guardar o anterior é importante para saber qual a zona livre anterior a zona livre solicitada
+  while(seguinte < zona && seguinte != nullptr) { // percorre até achar uma zona que seja posterior a essa, ou não encontrar
+    seguinte = seguinte->mp_Next; // preparando-se para checar a próxima zona
+    anterior = anterior->mp_Next; // atualizando o anterior para sempre permanecer um passo atrás
+  }
+  bool Imediato_anterior = false; // essa variavel guarda se a zona livre anterior é imediatamente antererior a essa sendo liberda
+  bool Imediato_seguinte = false; // enquanto essa guarda se o proximo é imediatamente consecutivo
+  if(zona == anterior + zona->mui_Length) Imediato_anterior = true; // caso seja vizinho anterior
+  if(zona + zona->mui_Length == seguinte) Imediato_seguinte = true; // caso seja vizinho seguinte
+  // existem diversas situações que devem ser tratadas de acordo
+  // caso a zona a ser liberada seja vizinha a duas outra zonas já livres
+  if(Imediato_anterior && Imediato_seguinte) { // as duas variaveis indicam que é todos são vizinhos
+    anterior->mp_Next = seguinte->mp_Next; // aponta para a proxima zona livre depois dos três
+    anterior->mui_Length += zona->mui_Length + seguinte->mui_Length; // o tamanho é equivalente a soma deles
+  }
+  // caso a zona a ser liberada seja vizinha a duas outra zonas ocupadas
+  if(!Imediato_anterior && !Imediato_seguinte) { // as duas variaveis indicam que ninguém está livre vizinho a essa zona
+    anterior->mp_Next = zona; // a zona anterior aponta para essa
+    zona = seguinte; // essa aponta para a zona livre seguinte
+  }
+  // caso a zona a ser liberada seja imediatamente anterior a uma livre porem não seja consecutiva a uma
+  if(!Imediato_anterior && Imediato_seguinte) { // a anterior está ocupada e a seguinte não, de acordo com as booleanas
+    anterior->mp_Next = zona; // a zona anterior aponta para essa
+    zona->mp_Next = seguinte->mp_Next; // essa zona aponta para a proxima livre
+    zona->mui_Length += seguinte->mui_Length; // combinando as duas em uma unica zona livre
+  }
+  // caso a zona a ser liberada seja imediatamente seguinte a uma livre porem não seja anterior a uma
+  if(Imediato_anterior && !Imediato_seguinte) { // a anterior está livre e a seguinte não, de acordo com as booleanas
+    anterior->mui_Length += zona->mui_Length; // apenas almentar o tamanho da zona imediatamente anterior já é suficiente
+  }
 }
 
 void SLPool::Mapear(void) {

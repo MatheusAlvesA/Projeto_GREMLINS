@@ -22,4 +22,5 @@ com a alocação que será feita da mesma forma que antes. Um arquivo main.cpp e
 disponível no diretório src/ ele realiza testes na classe MemoryPool buscando demonstrar seu funcionamento.
 
 #Até agora
-Nessa versão apenas protótipos foram criados, não existe código pronto ainda
+Nessa versão Alocar e liberar memória estão concluidos, mas não testados.
+depois de realizar testes de extres algumas melhorias serão feitas

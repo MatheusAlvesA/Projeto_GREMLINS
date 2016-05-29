@@ -15,6 +15,9 @@ int main() {
 
  p.Mapear(); // exibindo o estado da memória
 
+ delete teste;
+ p.Mapear();
+
 std::cout << "\n>>>>> Saida normal\n";
 	return 0;
 }
