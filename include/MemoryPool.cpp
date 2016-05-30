@@ -79,7 +79,7 @@ void SLPool::Free(void *entrada) {
   }
   bool Imediato_anterior = false; // essa variavel guarda se a zona livre anterior é imediatamente antererior a essa sendo liberda
   bool Imediato_seguinte = false; // enquanto essa guarda se o proximo é imediatamente consecutivo
-  if(zona == anterior + zona->mui_Length) Imediato_anterior = true; // caso seja vizinho anterior
+  if(zona == anterior + anterior->mui_Length) Imediato_anterior = true; // caso seja vizinho anterior
   if(zona + zona->mui_Length == seguinte) Imediato_seguinte = true; // caso seja vizinho seguinte
   // existem diversas situações que devem ser tratadas de acordo
   // caso a zona a ser liberada seja vizinha a duas outra zonas já livres

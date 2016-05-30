@@ -11,7 +11,7 @@ return (reinterpret_cast <void*>(tag + 1U));
 
 void *operator new(size_t bytes) { // Regular new
 Tag *const tag = reinterpret_cast<Tag*>(std::malloc(bytes + sizeof (Tag)));
-tag-> pool = nullptr;
+tag->pool = nullptr;
 // skip sizeof tag to get the raw data - block .
 return (reinterpret_cast<void*>(tag + 1U));
 }
