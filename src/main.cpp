@@ -148,9 +148,10 @@ for(time_t tempo = time(nullptr); tempo >= time(nullptr)-2;/*vazio*/) {
 }
 for(int x = 0; x < 100; x++) if(data[x] != nullptr) delete data[x]; // deletando qualquer coisa que tenha sido deixada para traz
 
-std::cout << "\n\n+++++++++++++++++RESULTADO DO TESTE MASSIVO++++++++++++++++++++++\n"
+std::cout << "\n\n=======================RESULTADO DO TESTE MASSIVO=========================\n"
           << "A classe de gerenciamento desenvolvida alocou " << alocs << " espaços de memória, e desalocou " << delocs << " espaços.\n"
-          << "O sistema operacional alocou " << alocs_so << " e, desalocou " << delocs_so << " espaços.\n Ambos executaram por dois segundos.\n";
+          << "O sistema operacional alocou " << alocs_so << ", e desalocou " << delocs_so << " espaços.\n" 
+          << "\n                        Ambos executaram por dois segundos.\n";
 if(alocs > alocs_so) { // a classe ganhou em alocações
 	std::cout << "\nA classe StoragePool venceu em numero de alocações, alocando " << alocs - alocs_so << " espaços a mais que o sistema operacional.\n";
 }
